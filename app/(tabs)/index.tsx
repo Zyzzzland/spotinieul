@@ -1,98 +1,373 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
-
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+import React from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  Image,
+} from 'react-native';
+import { useRouter } from 'expo-router';
+import { useMusic } from '@/contexts/music-context';
+import { Ionicons } from '@expo/vector-icons';
+import { useColorScheme } from '@/hooks/use-color-scheme';
+import { Colors } from '@/constants/theme';
 
 export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+  const { songs, playlists, playbackState, playSong, playPlaylist, getSongById } = useMusic();
+  const colorScheme = useColorScheme();
+  const colors = Colors[colorScheme ?? 'light'];
+  const router = useRouter();
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+  const recentSongs = songs.slice(-5).reverse();
+  const recentPlaylists = playlists.slice(-3).reverse();
+
+  const handlePlaySong = (song: any) => {
+    playSong(song, songs, songs.indexOf(song));
+    router.push('/player' as any);
+  };
+
+  const handlePlayPlaylist = (playlist: any) => {
+    if (playlist.songs.length > 0) {
+      playPlaylist(playlist);
+      router.push('/player' as any);
+    }
+  };
+
+  const getPlaylistCover = (playlist: any) => {
+    if (playlist.songs.length === 0) return null;
+    const firstSong = getSongById(playlist.songs[0]);
+    return firstSong?.albumArt;
+  };
+
+  return (
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
+        {/* Header */}
+        <View style={styles.header}>
+          <Text style={[styles.headerTitle, { color: colors.text }]}>
+            Welcome Back
+          </Text>
+          <Text style={[styles.headerSubtitle, { color: colors.icon }]}>
+            {songs.length} songs • {playlists.length} playlists
+          </Text>
+        </View>
+
+        {/* Quick Actions */}
+        <View style={styles.quickActions}>
+          <TouchableOpacity
+            style={[styles.quickActionCard, { backgroundColor: colors.icon + '15' }]}
+            onPress={() => router.push('/(tabs)/library')}
+          >
+            <Ionicons name="musical-notes" size={32} color="#1DB954" />
+            <Text style={[styles.quickActionText, { color: colors.text }]}>
+              My Library
+            </Text>
+            <Text style={[styles.quickActionCount, { color: colors.icon }]}>
+              {songs.length} songs
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.quickActionCard, { backgroundColor: colors.icon + '15' }]}
+            onPress={() => router.push('/(tabs)/playlists')}
+          >
+            <Ionicons name="list" size={32} color="#1DB954" />
+            <Text style={[styles.quickActionText, { color: colors.text }]}>
+              Playlists
+            </Text>
+            <Text style={[styles.quickActionCount, { color: colors.icon }]}>
+              {playlists.length} playlists
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Recently Added Songs */}
+        {recentSongs.length > 0 && (
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Text style={[styles.sectionTitle, { color: colors.text }]}>
+                Recently Added
+              </Text>
+              <TouchableOpacity onPress={() => router.push('/(tabs)/library')}>
+                <Text style={styles.seeAll}>See All</Text>
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.horizontalList}
+            >
+              {recentSongs.map((song) => (
+                <TouchableOpacity
+                  key={song.id}
+                  style={styles.songCard}
+                  onPress={() => handlePlaySong(song)}
+                >
+                  <View style={styles.songCardImageContainer}>
+                    {song.albumArt ? (
+                      <Image source={{ uri: song.albumArt }} style={styles.songCardImage} />
+                    ) : (
+                      <View style={[styles.songCardPlaceholder, { backgroundColor: colors.icon + '30' }]}>
+                        <Ionicons name="musical-notes" size={40} color={colors.icon} />
+                      </View>
+                    )}
+                    <View style={styles.songCardPlayOverlay}>
+                      <Ionicons name="play-circle" size={40} color="#1DB954" />
+                    </View>
+                  </View>
+                  <Text style={[styles.songCardTitle, { color: colors.text }]} numberOfLines={2}>
+                    {song.title}
+                  </Text>
+                  <Text style={[styles.songCardArtist, { color: colors.icon }]} numberOfLines={1}>
+                    {song.artist}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+        )}
+
+        {/* Recent Playlists */}
+        {recentPlaylists.length > 0 && (
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Text style={[styles.sectionTitle, { color: colors.text }]}>
+                Your Playlists
+              </Text>
+              <TouchableOpacity onPress={() => router.push('/(tabs)/playlists')}>
+                <Text style={styles.seeAll}>See All</Text>
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.playlistList}>
+              {recentPlaylists.map((playlist) => {
+                const coverArt = getPlaylistCover(playlist);
+                return (
+                  <TouchableOpacity
+                    key={playlist.id}
+                    style={[styles.playlistRow, { backgroundColor: colors.icon + '10' }]}
+                    onPress={() => router.push(`/playlist/${playlist.id}` as any)}
+                  >
+                    {coverArt ? (
+                      <Image source={{ uri: coverArt }} style={styles.playlistRowImage} />
+                    ) : (
+                      <View style={[styles.playlistRowPlaceholder, { backgroundColor: colors.icon + '30' }]}>
+                        <Ionicons name="list" size={24} color={colors.icon} />
+                      </View>
+                    )}
+                    <View style={styles.playlistRowInfo}>
+                      <Text style={[styles.playlistRowTitle, { color: colors.text }]} numberOfLines={1}>
+                        {playlist.name}
+                      </Text>
+                      <Text style={[styles.playlistRowCount, { color: colors.icon }]}>
+                        {playlist.songs.length} songs
+                      </Text>
+                    </View>
+                    <TouchableOpacity
+                      onPress={(e) => {
+                        e.stopPropagation();
+                        handlePlayPlaylist(playlist);
+                      }}
+                      style={styles.playlistPlayButton}
+                    >
+                      <Ionicons name="play-circle" size={40} color="#1DB954" />
+                    </TouchableOpacity>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+          </View>
+        )}
+
+        {/* Empty State */}
+        {songs.length === 0 && playlists.length === 0 && (
+          <View style={styles.emptyState}>
+            <Ionicons name="musical-notes-outline" size={80} color={colors.icon} />
+            <Text style={[styles.emptyTitle, { color: colors.text }]}>
+              Start Your Music Journey
+            </Text>
+            <Text style={[styles.emptyText, { color: colors.icon }]}>
+              Upload your first song or create a playlist to get started
+            </Text>
+            <TouchableOpacity
+              style={styles.emptyButton}
+              onPress={() => router.push('/(tabs)/library')}
+            >
+              <Text style={styles.emptyButtonText}>Add Songs</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+      </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  container: {
+    flex: 1,
   },
-  stepContainer: {
-    gap: 8,
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingBottom: 140,
+  },
+  header: {
+    padding: 20,
+    paddingTop: 60,
+  },
+  headerTitle: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    marginBottom: 4,
+  },
+  headerSubtitle: {
+    fontSize: 16,
+  },
+  quickActions: {
+    flexDirection: 'row',
+    paddingHorizontal: 16,
+    gap: 12,
+    marginBottom: 24,
+  },
+  quickActionCard: {
+    flex: 1,
+    padding: 20,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  quickActionText: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginTop: 12,
+  },
+  quickActionCount: {
+    fontSize: 14,
+    marginTop: 4,
+  },
+  section: {
+    marginBottom: 32,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    marginBottom: 16,
+  },
+  sectionTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+  },
+  seeAll: {
+    fontSize: 14,
+    color: '#1DB954',
+    fontWeight: '600',
+  },
+  horizontalList: {
+    paddingHorizontal: 16,
+    gap: 16,
+  },
+  songCard: {
+    width: 140,
+  },
+  songCardImageContainer: {
+    position: 'relative',
     marginBottom: 8,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
+  songCardImage: {
+    width: 140,
+    height: 140,
+    borderRadius: 8,
+  },
+  songCardPlaceholder: {
+    width: 140,
+    height: 140,
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  songCardPlayOverlay: {
     position: 'absolute',
+    bottom: 8,
+    right: 8,
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    borderRadius: 20,
+  },
+  songCardTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    marginBottom: 2,
+  },
+  songCardArtist: {
+    fontSize: 12,
+  },
+  playlistList: {
+    paddingHorizontal: 16,
+    gap: 12,
+  },
+  playlistRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 12,
+    borderRadius: 8,
+  },
+  playlistRowImage: {
+    width: 56,
+    height: 56,
+    borderRadius: 4,
+  },
+  playlistRowPlaceholder: {
+    width: 56,
+    height: 56,
+    borderRadius: 4,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  playlistRowInfo: {
+    flex: 1,
+    marginLeft: 12,
+  },
+  playlistRowTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 4,
+  },
+  playlistRowCount: {
+    fontSize: 13,
+  },
+  playlistPlayButton: {
+    padding: 4,
+  },
+  emptyState: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingTop: 60,
+    paddingHorizontal: 32,
+  },
+  emptyTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginTop: 24,
+    marginBottom: 12,
+  },
+  emptyText: {
+    fontSize: 16,
+    textAlign: 'center',
+    marginBottom: 32,
+  },
+  emptyButton: {
+    backgroundColor: '#1DB954',
+    paddingVertical: 14,
+    paddingHorizontal: 32,
+    borderRadius: 24,
+  },
+  emptyButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });
