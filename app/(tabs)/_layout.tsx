@@ -3,10 +3,11 @@ import React from 'react';
 import { View } from 'react-native';
 
 import { HapticTab } from '@/components/haptic-tab';
-import { IconSymbol } from '@/components/ui/icon-symbol';
 import { MiniPlayer } from '@/components/mini-player';
+import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { Fontisto } from '@expo/vector-icons';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -19,9 +20,12 @@ export default function TabLayout() {
           headerShown: false,
           tabBarButton: HapticTab,
           tabBarStyle: {
-            height: 0,
-            opacity: 0,
-            position: 'absolute',
+            backgroundColor: Colors[colorScheme ?? 'light'].background,
+            borderTopWidth: 1,
+            borderTopColor: '#282828',
+            height: 70,
+            paddingBottom: 10,
+            paddingTop: 10,
           },
         }}>
         <Tabs.Screen
@@ -35,44 +39,19 @@ export default function TabLayout() {
           name="library"
           options={{
             title: 'Library',
-            tabBarIcon: ({ color }) => <IconSymbol size={28} name="music.note.list" color={color} />,
+            tabBarIcon: ({ color }) => <Fontisto name="music-note" size={22} color={color} />,
           }}
         />
         <Tabs.Screen
           name="playlists"
           options={{
             title: 'Playlists',
-            tabBarIcon: ({ color }) => <IconSymbol size={28} name="square.stack.fill" color={color} />,
+            tabBarIcon: ({ color }) => <Fontisto name="play-list" size={18} color={color} />,
           }}
         />
-        <Tabs.Screen
-          name="explore"
-          options={{
-            title: 'Explore',
-            tabBarIcon: ({ color }) => <IconSymbol size={28} name="magnifyingglass" color={color} />,
-          }}
-        />
-        <Tabs.Screen
-          name="cast"
-          options={{
-            title: 'Cast',
-            tabBarIcon: ({ color }) => <IconSymbol size={28} name="speaker.wave.3.fill" color={color} />,
-          }}
-        />
+        
       </Tabs>
       <MiniPlayer />
-      <View
-        style={{
-          backgroundColor: Colors[colorScheme ?? 'light'].background,
-          paddingBottom: 0,
-          borderTopWidth: 1,
-          borderTopColor: '#E0E0E0',
-          height: 70,
-          flexDirection: 'row',
-        }}
-      >
-        {/* Custom Tab Bar would go here if needed */}
-      </View>
     </View>
   );
 }
