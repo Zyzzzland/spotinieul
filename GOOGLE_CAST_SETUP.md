@@ -34,6 +34,19 @@ A ready-to-use component with:
 
 A complete example showing how to use the audio casting functionality.
 
+### 5. **Integrated Music Context & Player** ✨ NEW
+**Locations:** 
+- `contexts/music-context.tsx` - Music playback context with built-in Cast support
+- `components/music-player.tsx` - Full-screen player with Cast controls
+- `components/mini-player.tsx` - Mini player with Cast status indicator
+
+**Features:**
+- Automatic switching between local and Cast playback
+- Seamless handoff when connecting/disconnecting from Cast devices
+- Cast button integrated into the music player UI
+- Real-time casting status in mini player
+- Position sync when switching between local and Cast playback
+
 ---
 
 ## 🚀 Installation & Setup
@@ -71,6 +84,39 @@ npm run ios
 ---
 
 ## 📱 How to Use
+
+### Integrated Music Player (Recommended)
+
+The music player now has built-in Google Cast support! Just play any song and you'll see:
+
+1. **Cast Button** at the top of the player
+2. **Device Name** when connected
+3. **Cast Icon** in the mini-player when casting
+4. **WiFi Button** to cast the current song when connected to a device
+
+**Automatic Behavior:**
+- When you connect to a Cast device and play a song, it automatically casts
+- When you tap the WiFi button, it transfers the current song to your Google Home
+- When you disconnect, playback automatically resumes locally
+- All controls (play/pause, seek, next/previous) work seamlessly with Cast
+
+**Usage:**
+```typescript
+// Just use the music context as normal!
+import { useMusic } from '@/contexts/music-context';
+
+function MyComponent() {
+  const { playSong, isCastConnected, castDeviceName } = useMusic();
+  
+  // Play a song - it will automatically cast if connected
+  await playSong(mySong);
+  
+  // Check casting status
+  if (isCastConnected) {
+    console.log(`Casting to ${castDeviceName}`);
+  }
+}
+```
 
 ### Basic Usage with the Hook
 
@@ -210,6 +256,15 @@ interface AudioCastOptions {
 ---
 
 ## 🐛 Troubleshooting
+
+### Issue: "TypeError: Cannot read property 'SESSION_STARTED' of null" or similar errors
+**Solution:** This error occurs when running in **Expo Go**. Google Cast requires native code and will NOT work in Expo Go.
+
+**To fix:**
+1. Build a development build: `npx expo prebuild`
+2. Run on device: `npm run android` or `npm run ios`
+
+The app is designed to gracefully handle the missing module in Expo Go and will show "Cast unavailable" messages instead of crashing.
 
 ### Issue: "No cast client available"
 **Solution:** Make sure you're connected to a Cast device. Tap the Cast button and select a device first.

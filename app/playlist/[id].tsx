@@ -67,7 +67,7 @@ export default function PlaylistDetailScreen() {
 
   const handleAddSong = (songId: string) => {
     addSongToPlaylist(playlist.id, songId);
-    Alert.alert('Success', 'Song added to playlist');
+    setShowAddSongModal(false);
   };
 
   const handlePlayPlaylist = () => {

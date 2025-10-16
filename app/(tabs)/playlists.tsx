@@ -37,7 +37,6 @@ export default function PlaylistsScreen() {
     setNewPlaylistName('');
     setNewPlaylistDesc('');
     setShowCreateModal(false);
-    Alert.alert('Success', 'Playlist created');
   };
 
   const handleDeletePlaylist = (playlist: Playlist) => {

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 
-// Conditionally import Google Cast modules
+// Check if Google Cast is available
+let isGoogleCastAvailable = false;
 let useRemoteMediaClient: any;
 let useCastSession: any;
 let CastState: any;
@@ -9,18 +10,25 @@ let MediaInfo: any;
 
 try {
   const googleCast = require('react-native-google-cast');
-  useRemoteMediaClient = googleCast.useRemoteMediaClient;
-  useCastSession = googleCast.useCastSession;
-  CastState = googleCast.CastState;
-  useCastState = googleCast.useCastState;
-  MediaInfo = googleCast.MediaInfo;
+  // Check if the native module is actually loaded
+  if (googleCast.default && googleCast.default.SessionManager) {
+    useRemoteMediaClient = googleCast.useRemoteMediaClient;
+    useCastSession = googleCast.useCastSession;
+    CastState = googleCast.CastState;
+    useCastState = googleCast.useCastState;
+    MediaInfo = googleCast.MediaInfo;
+    isGoogleCastAvailable = true;
+  } else {
+    throw new Error('Native module not initialized');
+  }
 } catch (e) {
   // Google Cast not available - create mock hooks
+  isGoogleCastAvailable = false;
   useRemoteMediaClient = () => null;
   useCastSession = () => null;
   useCastState = () => 0;
   CastState = { CONNECTED: 4, NOT_CONNECTED: 1, CONNECTING: 2, NO_DEVICES_AVAILABLE: 0 };
-  console.log('Google Cast hooks not available - running in Expo Go');
+  console.log('Google Cast not available - running in Expo Go or module not initialized');
 }
 
 export interface AudioCastOptions {
@@ -35,6 +43,25 @@ export interface AudioCastOptions {
 }
 
 export function useGoogleCast() {
+  // If Google Cast is not available, return a safe mock implementation
+  if (!isGoogleCastAvailable) {
+    return {
+      isConnected: false,
+      isPlaying: false,
+      currentPosition: 0,
+      duration: 0,
+      deviceName: null,
+      isAvailable: false,
+      castAudio: async () => {
+        console.warn('Google Cast not available');
+      },
+      play: async () => {},
+      pause: async () => {},
+      stop: async () => {},
+      seek: async () => {},
+    };
+  }
+
   const client = useRemoteMediaClient();
   const castSession = useCastSession();
   const castState = useCastState();
@@ -154,6 +181,7 @@ export function useGoogleCast() {
     currentPosition,
     duration,
     deviceName: getDeviceName(),
+    isAvailable: isGoogleCastAvailable,
 
     // Methods
     castAudio,
@@ -163,3 +191,6 @@ export function useGoogleCast() {
     seek,
   };
 }
+
+// Export the availability flag
+export { isGoogleCastAvailable };

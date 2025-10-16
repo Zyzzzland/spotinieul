@@ -14,7 +14,7 @@ import { Colors } from '@/constants/theme';
 import { useRouter } from 'expo-router';
 
 export function MiniPlayer() {
-  const { playbackState, togglePlayPause, nextSong } = useMusic();
+  const { playbackState, togglePlayPause, nextSong, isCastConnected, castDeviceName } = useMusic();
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? 'light'];
   const router = useRouter();
@@ -51,11 +51,16 @@ export function MiniPlayer() {
 
         {/* Song Info */}
         <View style={styles.songInfo}>
-          <Text style={[styles.title, { color: colors.text }]} numberOfLines={1}>
-            {currentSong.title}
-          </Text>
+          <View style={styles.titleRow}>
+            <Text style={[styles.title, { color: colors.text }]} numberOfLines={1}>
+              {currentSong.title}
+            </Text>
+            {isCastConnected && (
+              <Ionicons name="wifi" size={12} color="#1DB954" style={styles.castIcon} />
+            )}
+          </View>
           <Text style={[styles.artist, { color: colors.icon }]} numberOfLines={1}>
-            {currentSong.artist}
+            {isCastConnected && castDeviceName ? `Casting to ${castDeviceName}` : currentSong.artist}
           </Text>
         </View>
 
@@ -133,10 +138,19 @@ const styles = StyleSheet.create({
     flex: 1,
     marginLeft: 12,
   },
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
   title: {
     fontSize: 14,
     fontWeight: '600',
     marginBottom: 2,
+    flex: 1,
+  },
+  castIcon: {
+    marginLeft: 4,
   },
   artist: {
     fontSize: 12,

@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect, useRef } from 'r
 import { Audio } from 'expo-av';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { Song, Playlist, PlaybackState } from '@/types/music';
+import { useGoogleCast } from '@/hooks/use-google-cast';
 
 interface MusicContextType {
   // Songs
@@ -28,6 +29,11 @@ interface MusicContextType {
   seekTo: (position: number) => Promise<void>;
   toggleRepeat: () => void;
   toggleShuffle: () => void;
+
+  // Google Cast
+  isCastConnected: boolean;
+  castDeviceName: string | null;
+  castCurrentSong: () => Promise<void>;
 }
 
 const MusicContext = createContext<MusicContextType | undefined>(undefined);
@@ -48,6 +54,10 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
 
   const soundRef = useRef<Audio.Sound | null>(null);
   const positionUpdateInterval = useRef<any>(null);
+  const usingCastRef = useRef<boolean>(false);
+  
+  // Google Cast integration
+  const googleCast = useGoogleCast();
 
   // Load data from storage
   useEffect(() => {
@@ -204,7 +214,57 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
 
   const playSong = async (song: Song, queue?: Song[], startIndex?: number) => {
     try {
-      // Unload previous sound
+      // Check if we should use Cast or local playback
+      if (googleCast.isConnected) {
+        // Check if the URI is a local file (which Google Cast cannot access)
+        const isLocalFile = song.uri.startsWith('file://') || 
+                           song.uri.startsWith('/') || 
+                           !song.uri.startsWith('http://') && !song.uri.startsWith('https://');
+        
+        if (isLocalFile) {
+          console.warn('Cannot cast local files. Google Cast requires HTTP/HTTPS URLs. Falling back to local playback.');
+          // Alert.alert can be added here if you want user notification
+          // For now, just fall through to local playback
+        } else {
+          try {
+            // Stop local playback if active
+            if (soundRef.current) {
+              await soundRef.current.unloadAsync();
+              soundRef.current = null;
+            }
+            if (positionUpdateInterval.current) {
+              clearInterval(positionUpdateInterval.current);
+            }
+
+            // Cast to Google Home
+            await googleCast.castAudio({
+              contentUrl: song.uri,
+              contentType: 'audio/mp3',
+              title: song.title,
+              artist: song.artist,
+              albumArt: song.albumArt,
+              streamDuration: song.duration,
+            });
+
+            usingCastRef.current = true;
+            setPlaybackState({
+              ...playbackState,
+              currentSong: song,
+              isPlaying: true,
+              queue: queue || [song],
+              currentIndex: startIndex ?? 0,
+              position: 0,
+            });
+            startCastPositionUpdates();
+            return; // Successfully casted
+          } catch (castError) {
+            console.error('Cast failed, falling back to local playback:', castError);
+            // Fall through to local playback
+          }
+        }
+      }
+      
+      // Play locally using expo-av
       if (soundRef.current) {
         await soundRef.current.unloadAsync();
       }
@@ -216,6 +276,7 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
       );
 
       soundRef.current = sound;
+      usingCastRef.current = false;
       
       setPlaybackState({
         ...playbackState,
@@ -243,21 +304,31 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
   };
 
   const togglePlayPause = async () => {
-    if (!soundRef.current) return;
-
     try {
-      const status = await soundRef.current.getStatusAsync();
-      if (status.isLoaded) {
+      if (usingCastRef.current && googleCast.isConnected) {
+        // Control Cast playback
         if (playbackState.isPlaying) {
-          await soundRef.current.pauseAsync();
-          if (positionUpdateInterval.current) {
-            clearInterval(positionUpdateInterval.current);
-          }
+          await googleCast.pause();
         } else {
-          await soundRef.current.playAsync();
-          startPositionUpdates();
+          await googleCast.play();
         }
         setPlaybackState((prev) => ({ ...prev, isPlaying: !prev.isPlaying }));
+      } else {
+        // Control local playback
+        if (!soundRef.current) return;
+        const status = await soundRef.current.getStatusAsync();
+        if (status.isLoaded) {
+          if (playbackState.isPlaying) {
+            await soundRef.current.pauseAsync();
+            if (positionUpdateInterval.current) {
+              clearInterval(positionUpdateInterval.current);
+            }
+          } else {
+            await soundRef.current.playAsync();
+            startPositionUpdates();
+          }
+          setPlaybackState((prev) => ({ ...prev, isPlaying: !prev.isPlaying }));
+        }
       }
     } catch (error) {
       console.error('Error toggling play/pause:', error);
@@ -298,11 +369,15 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
   };
 
   const seekTo = async (position: number) => {
-    if (!soundRef.current) return;
-
     try {
-      await soundRef.current.setPositionAsync(position * 1000);
-      setPlaybackState((prev) => ({ ...prev, position }));
+      if (usingCastRef.current && googleCast.isConnected) {
+        await googleCast.seek(position);
+        setPlaybackState((prev) => ({ ...prev, position }));
+      } else {
+        if (!soundRef.current) return;
+        await soundRef.current.setPositionAsync(position * 1000);
+        setPlaybackState((prev) => ({ ...prev, position }));
+      }
     } catch (error) {
       console.error('Error seeking:', error);
     }
@@ -328,6 +403,130 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  // Position updates for Cast playback
+  const startCastPositionUpdates = () => {
+    if (positionUpdateInterval.current) {
+      clearInterval(positionUpdateInterval.current);
+    }
+    positionUpdateInterval.current = setInterval(() => {
+      if (googleCast && googleCast.isConnected) {
+        try {
+          setPlaybackState((prev) => ({
+            ...prev,
+            position: googleCast.currentPosition || 0,
+            duration: googleCast.duration || 0,
+            isPlaying: googleCast.isPlaying || false,
+          }));
+
+          // Auto-advance if ended
+          if (googleCast.duration > 0 && googleCast.currentPosition >= googleCast.duration - 1) {
+            nextSong();
+          }
+        } catch (error) {
+          console.error('Error updating Cast position:', error);
+        }
+      }
+    }, 1000);
+  };
+
+  // Cast the current song to Google Home
+  const castCurrentSong = async () => {
+    if (!playbackState.currentSong) {
+      console.warn('No song currently playing');
+      return;
+    }
+
+    if (!googleCast.isConnected) {
+      console.warn('Not connected to a Cast device');
+      return;
+    }
+
+    const currentSong = playbackState.currentSong;
+    
+    // Check if the URI is a local file (which Google Cast cannot access)
+    const isLocalFile = currentSong.uri.startsWith('file://') || 
+                       currentSong.uri.startsWith('/') || 
+                       !currentSong.uri.startsWith('http://') && !currentSong.uri.startsWith('https://');
+    
+    if (isLocalFile) {
+      console.error('Cannot cast local files. Google Cast requires HTTP/HTTPS URLs from streaming services.');
+      throw new Error('Cannot cast local files. Google Cast requires publicly accessible HTTP/HTTPS URLs.');
+    }
+
+    try {
+      // Get current position before stopping local playback
+      const currentPos = playbackState.position;
+
+      // Stop local playback
+      if (soundRef.current) {
+        await soundRef.current.unloadAsync();
+        soundRef.current = null;
+      }
+      if (positionUpdateInterval.current) {
+        clearInterval(positionUpdateInterval.current);
+      }
+
+      // Start casting
+      await googleCast.castAudio({
+        contentUrl: currentSong.uri,
+        contentType: 'audio/mp3',
+        title: currentSong.title,
+        artist: currentSong.artist,
+        albumArt: currentSong.albumArt,
+        streamDuration: currentSong.duration,
+        startTime: currentPos,
+      });
+
+      usingCastRef.current = true;
+      setPlaybackState((prev) => ({ ...prev, isPlaying: true }));
+      startCastPositionUpdates();
+    } catch (error) {
+      console.error('Error casting song:', error);
+      // Resume local playback on error
+      if (playbackState.currentSong) {
+        try {
+          const { sound } = await Audio.Sound.createAsync(
+            { uri: playbackState.currentSong.uri },
+            { shouldPlay: true, positionMillis: playbackState.position * 1000 },
+            onPlaybackStatusUpdate
+          );
+          soundRef.current = sound;
+          usingCastRef.current = false;
+          startPositionUpdates();
+        } catch (resumeError) {
+          console.error('Error resuming playback:', resumeError);
+        }
+      }
+      throw error;
+    }
+  };
+
+  // Handle Cast disconnection - switch back to local playback
+  useEffect(() => {
+    if (!googleCast || !googleCast.isConnected) {
+      if (usingCastRef.current && playbackState.currentSong) {
+        // Cast disconnected, resume local playback
+        const resumeLocalPlayback = async () => {
+          const currentPos = playbackState.position;
+          usingCastRef.current = false;
+          
+          try {
+            const { sound } = await Audio.Sound.createAsync(
+              { uri: playbackState.currentSong!.uri },
+              { shouldPlay: true, positionMillis: currentPos * 1000 },
+              onPlaybackStatusUpdate
+            );
+            soundRef.current = sound;
+            startPositionUpdates();
+          } catch (error) {
+            console.error('Error resuming local playback:', error);
+          }
+        };
+        resumeLocalPlayback();
+      }
+    }
+  }, [googleCast?.isConnected]);
+
   return (
     <MusicContext.Provider
       value={{
@@ -350,6 +549,9 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
         seekTo,
         toggleRepeat,
         toggleShuffle,
+        isCastConnected: googleCast.isConnected,
+        castDeviceName: googleCast.deviceName,
+        castCurrentSong,
       }}
     >
       {children}

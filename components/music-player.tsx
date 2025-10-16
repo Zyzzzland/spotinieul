@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -6,12 +6,22 @@ import {
   TouchableOpacity,
   Image,
   Dimensions,
+  ActivityIndicator,
+  Alert,
 } from 'react-native';
 import { useMusic } from '@/contexts/music-context';
 import { Ionicons } from '@expo/vector-icons';
 import Slider from '@react-native-community/slider';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Colors } from '@/constants/theme';
+
+// Conditionally import CastButton
+let CastButton: any = null;
+try {
+  CastButton = require('react-native-google-cast').CastButton;
+} catch (e) {
+  // Google Cast not available in Expo Go
+}
 
 const { width } = Dimensions.get('window');
 
@@ -24,10 +34,14 @@ export function MusicPlayer() {
     seekTo,
     toggleRepeat,
     toggleShuffle,
+    isCastConnected,
+    castDeviceName,
+    castCurrentSong,
   } = useMusic();
 
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? 'light'];
+  const [isCasting, setIsCasting] = useState(false);
 
   const { currentSong, isPlaying, position, duration, repeatMode, shuffleMode } = playbackState;
 
@@ -41,9 +55,46 @@ export function MusicPlayer() {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
+  const handleCastPress = async () => {
+    if (!currentSong) return;
+    
+    if (!isCastConnected) {
+      Alert.alert('Not Connected', 'Please connect to a Cast device first using the Cast button.');
+      return;
+    }
+
+    setIsCasting(true);
+    try {
+      await castCurrentSong();
+    } catch (error) {
+      console.error('Error casting:', error);
+      Alert.alert('Cast Error', 'Failed to cast music. Please try again.');
+    } finally {
+      setIsCasting(false);
+    }
+  };
+
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
+      {/* Cast Button */}
+      <View style={styles.castContainer}>
+        {CastButton ? (
+          <View style={styles.castButtonWrapper}>
+            <CastButton style={styles.castButton} />
+            {isCastConnected && castDeviceName && (
+              <Text style={[styles.castDeviceText, { color: '#1DB954' }]}>
+                🔊 {castDeviceName}
+              </Text>
+            )}
+          </View>
+        ) : (
+          <View style={styles.castUnavailable}>
+            <Text style={styles.castUnavailableText}>Cast unavailable in Expo Go</Text>
+          </View>
+        )}
+      </View>
+
       {/* Album Art */}
       <View style={styles.albumArtContainer}>
         {currentSong.albumArt ? (
@@ -95,6 +146,21 @@ export function MusicPlayer() {
             />
           </TouchableOpacity>
 
+          {/* Cast current song button */}
+          {isCastConnected && (
+            <TouchableOpacity
+              onPress={handleCastPress}
+              style={[styles.iconButton, styles.castActionButton]}
+              disabled={isCasting}
+            >
+              {isCasting ? (
+                <ActivityIndicator size="small" color="#1DB954" />
+              ) : (
+                <Ionicons name="wifi" size={24} color="#1DB954" />
+              )}
+            </TouchableOpacity>
+          )}
+
           <TouchableOpacity
             onPress={toggleRepeat}
             style={[styles.iconButton, repeatMode !== 'off' && styles.activeButton]}
@@ -140,6 +206,37 @@ const styles = StyleSheet.create({
     padding: 24,
     paddingTop: 60,
     alignItems: 'center',
+  },
+  castContainer: {
+    width: '100%',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  castButtonWrapper: {
+    alignItems: 'center',
+    gap: 8,
+  },
+  castButton: {
+    width: 36,
+    height: 36,
+    tintColor: '#1DB954',
+  },
+  castDeviceText: {
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  castUnavailable: {
+    backgroundColor: 'rgba(255, 193, 7, 0.1)',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 12,
+  },
+  castUnavailableText: {
+    fontSize: 11,
+    color: '#FFC107',
+  },
+  castActionButton: {
+    backgroundColor: 'rgba(29, 185, 84, 0.15)',
   },
   albumArtContainer: {
     width: width - 80,
@@ -200,7 +297,7 @@ const styles = StyleSheet.create({
   secondaryControls: {
     flexDirection: 'row',
     justifyContent: 'center',
-    gap: 40,
+    gap: 24,
     marginBottom: 8,
   },
   mainControls: {

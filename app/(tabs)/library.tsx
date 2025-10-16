@@ -11,7 +11,7 @@ import {
   Modal,
 } from 'react-native';
 import * as DocumentPicker from 'expo-document-picker';
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
 import { useMusic } from '@/contexts/music-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useColorScheme } from '@/hooks/use-color-scheme';
@@ -92,7 +92,6 @@ export default function LibraryScreen() {
       };
 
       await addSong(newSong);
-      Alert.alert('Success', 'Song added to library');
       
       setShowMetadataModal(false);
       setTempFileUri('');
