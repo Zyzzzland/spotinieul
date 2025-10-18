@@ -49,6 +49,13 @@ export default function TabLayout() {
             tabBarIcon: ({ color }) => <Fontisto name="play-list" size={18} color={color} />,
           }}
         />
+        <Tabs.Screen
+          name="flashcards"
+          options={{
+            title: 'Flashcards',
+            tabBarIcon: ({ color }) => <Fontisto size={22} name="pingdom" color={color} />,
+          }}
+        />
         
       </Tabs>
       <MiniPlayer />
