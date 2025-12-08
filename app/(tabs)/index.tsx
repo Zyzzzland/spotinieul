@@ -4,12 +4,12 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React from 'react';
 import {
-    Image,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 
 export default function HomeScreen() {
@@ -108,8 +108,8 @@ export default function HomeScreen() {
                     {song.albumArt ? (
                       <Image source={{ uri: song.albumArt }} style={styles.songCardImage} />
                     ) : (
-                      <View style={[styles.songCardPlaceholder, { backgroundColor: colors.icon + '30' }]}>
-                        <Ionicons name="musical-notes" size={40} color={colors.icon} />
+                      <View style={[styles.songCardPlaceholder, { backgroundColor: colors.icon + '15' }]}>
+                        <Ionicons name="musical-notes" size={40} color={themeColors.primary} />
                       </View>
                     )}
                     <View style={styles.songCardPlayOverlay}>
@@ -153,7 +153,7 @@ export default function HomeScreen() {
                       <Image source={{ uri: coverArt }} style={styles.playlistRowImage} />
                     ) : (
                       <View style={[styles.playlistRowPlaceholder, { backgroundColor: colors.icon + '30' }]}>
-                        <Ionicons name="list" size={24} color={colors.icon} />
+                        <Ionicons name="list" size={24} color={themeColors.primary} />
                       </View>
                     )}
                     <View style={styles.playlistRowInfo}>
@@ -292,7 +292,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 8,
     right: 8,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    backgroundColor: 'rgba(0, 0, 0, 0)',
     borderRadius: 20,
   },
   songCardTitle: {

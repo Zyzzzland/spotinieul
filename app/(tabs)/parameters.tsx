@@ -6,11 +6,11 @@ import { useAppColors } from '@/hooks/use-theme-color';
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import {
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from 'react-native';
 
 export default function ParametersScreen() {
@@ -19,12 +19,16 @@ export default function ParametersScreen() {
   const isDark = colorScheme === 'dark';
   const { colorTheme, setColorTheme } = useTheme();
 
-  const colorOptions: ColorThemeType[] = ['blue', 'red', 'pink', 'green'];
+  const colorOptions: ColorThemeType[] = ['blue', 'red', 'pink', 'green', 'purple', 'orange', 'cyan', 'yellow'];
   const colorLabels: Record<ColorThemeType, string> = {
     blue: 'Bleu',
     red: 'Rouge',
     pink: 'Rose',
     green: 'Vert',
+    purple: 'Violet',
+    orange: 'Orange',
+    cyan: 'Cyan',
+    yellow: 'Jaune',
   };
 
   const themeIcons: Record<ColorThemeType, keyof typeof Ionicons.glyphMap> = {
@@ -32,6 +36,10 @@ export default function ParametersScreen() {
     red: 'flame',
     pink: 'heart',
     green: 'leaf',
+    purple: 'flower',
+    orange: 'sunny',
+    cyan: 'water-outline',
+    yellow: 'star',
   };
 
   const getThemeAccentColor = (theme: ColorThemeType) => {
@@ -66,8 +74,8 @@ export default function ParametersScreen() {
                 style={[
                   styles.themePreviewCard,
                   {
-                    backgroundColor: isDark ? '#2a2a2a' : '#f5f5f5',
-                    borderColor: colorTheme === theme ? getThemeAccentColor(theme) : (isDark ? '#444' : '#ddd'),
+                    backgroundColor: colors.icon+'15',
+                    borderColor: colorTheme === theme ? getThemeAccentColor(theme) : getThemeAccentColor(colorTheme) + '30',
                     borderWidth: colorTheme === theme ? 2 : 1,
                   },
                 ]}
@@ -99,7 +107,7 @@ export default function ParametersScreen() {
             <Text style={[styles.sectionTitle, { color: colors.text }]}>À propos</Text>
           </View>
 
-          <View style={[styles.infoCard, { backgroundColor: isDark ? '#2a2a2a' : '#f5f5f5', borderLeftColor: getThemeAccentColor(colorTheme) }]}>
+          <View style={[styles.infoCard, { backgroundColor: colors.icon+'15', borderLeftColor: getThemeAccentColor(colorTheme) }]}>
             <View style={styles.infoCardHeader}>
               <Ionicons name="cube" size={20} color={getThemeAccentColor(colorTheme)} />
               <Text style={[styles.infoLabel, { color: colors.icon }]}>Version de l'app</Text>
@@ -107,7 +115,7 @@ export default function ParametersScreen() {
             <Text style={[styles.infoValue, { color: colors.text }]}>1.0.0</Text>
           </View>
 
-          <View style={[styles.infoCard, { backgroundColor: isDark ? '#2a2a2a' : '#f5f5f5', borderLeftColor: getThemeAccentColor(colorTheme) }]}>
+          <View style={[styles.infoCard, { backgroundColor: colors.icon+'15', borderLeftColor: getThemeAccentColor(colorTheme) }]}>
             <View style={styles.infoCardHeader}>
               <Ionicons name="color-palette" size={20} color={getThemeAccentColor(colorTheme)} />
               <Text style={[styles.infoLabel, { color: colors.icon }]}>Thème sélectionné</Text>
@@ -117,7 +125,7 @@ export default function ParametersScreen() {
             </Text>
           </View>
 
-          <View style={[styles.infoCard, { backgroundColor: isDark ? '#2a2a2a' : '#f5f5f5', borderLeftColor: getThemeAccentColor(colorTheme) }]}>
+          <View style={[styles.infoCard, { backgroundColor: colors.icon+'15', borderLeftColor: getThemeAccentColor(colorTheme) }]}>
             <View style={styles.infoCardHeader}>
               <Ionicons name={isDark ? 'moon' : 'sunny'} size={20} color={getThemeAccentColor(colorTheme)} />
               <Text style={[styles.infoLabel, { color: colors.icon }]}>Mode</Text>

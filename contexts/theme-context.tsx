@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 
-export type ColorThemeType = 'blue' | 'red' | 'pink' | 'green';
+export type ColorThemeType = 'blue' | 'red' | 'pink' | 'green' | 'purple' | 'orange' | 'cyan' | 'yellow';
 
 interface ThemeContextType {
   colorTheme: ColorThemeType;
@@ -19,7 +19,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     const loadTheme = async () => {
       try {
         const savedTheme = await AsyncStorage.getItem('app-color-theme');
-        if (savedTheme && (savedTheme === 'blue' || savedTheme === 'red' || savedTheme === 'pink' || savedTheme === 'green')) {
+        const validThemes: ColorThemeType[] = ['blue', 'red', 'pink', 'green', 'purple', 'orange', 'cyan', 'yellow'];
+        if (savedTheme && validThemes.includes(savedTheme as ColorThemeType)) {
           setColorThemeState(savedTheme as ColorThemeType);
         }
       } catch (error) {

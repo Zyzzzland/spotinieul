@@ -15,6 +15,10 @@ export const ColorThemes: Record<ColorThemeType, string> = {
   red: '#F44336',
   pink: '#E91E63',
   green: '#1DB954',
+  purple: '#9C27B0',
+  orange: '#FF9800',
+  cyan: '#00BCD4',
+  yellow: '#FFC107',
 };
 
 // Color theme variants for light and dark mode
@@ -34,6 +38,22 @@ export const ColorThemeVariants: Record<ColorThemeType, { light: string; dark: s
   green: {
     light: '#1DB954',
     dark: '#3D5A3D',
+  },
+  purple: {
+    light: '#9C27B0',
+    dark: '#6B3A6B',
+  },
+  orange: {
+    light: '#FF9800',
+    dark: '#6B4A2A',
+  },
+  cyan: {
+    light: '#00BCD4',
+    dark: '#2A5A6B',
+  },
+  yellow: {
+    light: '#FFC107',
+    dark: '#6B5A2A',
   },
 };
 
@@ -55,6 +75,22 @@ export const ThemeBackgrounds: Record<ColorThemeType, { light: string; dark: str
     light: '#E8F5E9', // Light green background
     dark: '#0A1A0A',  // Dark green background
   },
+  purple: {
+    light: '#F3E5F5', // Light purple background
+    dark: '#1A0A1A',  // Dark purple background
+  },
+  orange: {
+    light: '#FFF3E0', // Light orange background
+    dark: '#1A0F0A',  // Dark orange background
+  },
+  cyan: {
+    light: '#E0F2F1', // Light cyan background
+    dark: '#0A1A1A',  // Dark cyan background
+  },
+  yellow: {
+    light: '#FFFDE7', // Light yellow background
+    dark: '#1A1A0A',  // Dark yellow background
+  },
 };
 
 // Text and icon colors that work with themed backgrounds
@@ -75,6 +111,22 @@ export const ThemeTextColors: Record<ColorThemeType, { light: { text: string; ic
     light: { text: '#1B5E20', icon: '#2E7D32' },
     dark: { text: '#E8F5E9', icon: '#66BB6A' },
   },
+  purple: {
+    light: { text: '#4A148C', icon: '#7B1FA2' },
+    dark: { text: '#F3E5F5', icon: '#CE93D8' },
+  },
+  orange: {
+    light: { text: '#E65100', icon: '#F57C00' },
+    dark: { text: '#FFF3E0', icon: '#FFB74D' },
+  },
+  cyan: {
+    light: { text: '#00838F', icon: '#0097A7' },
+    dark: { text: '#E0F2F1', icon: '#80DEEA' },
+  },
+  yellow: {
+    light: { text: '#F57F17', icon: '#FBC02D' },
+    dark: { text: '#FFFDE7', icon: '#FFD54F' },
+  },
 };
 
 // Theme preview colors for the theme selector (light and dark variants)
@@ -94,6 +146,22 @@ export const ThemePreviewColors: Record<ColorThemeType, { light: { primary: stri
   green: {
     light: { primary: '#1DB954', secondary: '#E8F5E9', accent: '#2E7D32' },
     dark: { primary: '#3D5A3D', secondary: '#1F3D1F', accent: '#5A8A5A' },
+  },
+  purple: {
+    light: { primary: '#9C27B0', secondary: '#F3E5F5', accent: '#7B1FA2' },
+    dark: { primary: '#6B3A6B', secondary: '#3D1F3D', accent: '#8B5A8B' },
+  },
+  orange: {
+    light: { primary: '#FF9800', secondary: '#FFF3E0', accent: '#F57C00' },
+    dark: { primary: '#6B4A2A', secondary: '#3D2A1F', accent: '#8B6A3A' },
+  },
+  cyan: {
+    light: { primary: '#00BCD4', secondary: '#E0F2F1', accent: '#0097A7' },
+    dark: { primary: '#2A5A6B', secondary: '#1F3D3D', accent: '#4A7A8B' },
+  },
+  yellow: {
+    light: { primary: '#FFC107', secondary: '#FFFDE7', accent: '#FBC02D' },
+    dark: { primary: '#6B5A2A', secondary: '#3D3D1F', accent: '#8B7A3A' },
   },
 };
 
