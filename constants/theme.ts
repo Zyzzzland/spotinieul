@@ -3,10 +3,99 @@
  * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
  */
 
+import type { ColorThemeType } from '@/contexts/theme-context';
 import { Platform } from 'react-native';
 
 const tintColorLight = '#0a7ea4';
 const tintColorDark = '#fff';
+
+// Color theme definitions
+export const ColorThemes: Record<ColorThemeType, string> = {
+  blue: '#2196F3',
+  red: '#F44336',
+  pink: '#E91E63',
+  green: '#1DB954',
+};
+
+// Color theme variants for light and dark mode
+export const ColorThemeVariants: Record<ColorThemeType, { light: string; dark: string }> = {
+  blue: {
+    light: '#2196F3',
+    dark: '#3D5A80',
+  },
+  red: {
+    light: '#F44336',
+    dark: '#6B3A3A',
+  },
+  pink: {
+    light: '#E91E63',
+    dark: '#6B3A52',
+  },
+  green: {
+    light: '#1DB954',
+    dark: '#3D5A3D',
+  },
+};
+
+// Background colors for each theme (light and dark variants)
+export const ThemeBackgrounds: Record<ColorThemeType, { light: string; dark: string }> = {
+  blue: {
+    light: '#E3F2FD', // Light blue background
+    dark: '#0A1929',   // Dark blue background
+  },
+  red: {
+    light: '#FFEBEE', // Light red background
+    dark: '#1A0A0A',  // Dark red background
+  },
+  pink: {
+    light: '#FCE4EC', // Light pink background
+    dark: '#1A0A14',  // Dark pink background
+  },
+  green: {
+    light: '#E8F5E9', // Light green background
+    dark: '#0A1A0A',  // Dark green background
+  },
+};
+
+// Text and icon colors that work with themed backgrounds
+export const ThemeTextColors: Record<ColorThemeType, { light: { text: string; icon: string }; dark: { text: string; icon: string } }> = {
+  blue: {
+    light: { text: '#0D47A1', icon: '#1976D2' },
+    dark: { text: '#E3F2FD', icon: '#90CAF9' },
+  },
+  red: {
+    light: { text: '#B71C1C', icon: '#C62828' },
+    dark: { text: '#FFEBEE', icon: '#EF5350' },
+  },
+  pink: {
+    light: { text: '#880E4F', icon: '#AD1457' },
+    dark: { text: '#FCE4EC', icon: '#F48FB1' },
+  },
+  green: {
+    light: { text: '#1B5E20', icon: '#2E7D32' },
+    dark: { text: '#E8F5E9', icon: '#66BB6A' },
+  },
+};
+
+// Theme preview colors for the theme selector (light and dark variants)
+export const ThemePreviewColors: Record<ColorThemeType, { light: { primary: string; secondary: string; accent: string }; dark: { primary: string; secondary: string; accent: string } }> = {
+  blue: {
+    light: { primary: '#2196F3', secondary: '#E3F2FD', accent: '#1976D2' },
+    dark: { primary: '#3D5A80', secondary: '#1A2A3D', accent: '#5A7FA3' },
+  },
+  red: {
+    light: { primary: '#F44336', secondary: '#FFEBEE', accent: '#C62828' },
+    dark: { primary: '#6B3A3A', secondary: '#3D1F1F', accent: '#8B5A5A' },
+  },
+  pink: {
+    light: { primary: '#E91E63', secondary: '#FCE4EC', accent: '#AD1457' },
+    dark: { primary: '#6B3A52', secondary: '#3D1F2A', accent: '#8B5A7A' },
+  },
+  green: {
+    light: { primary: '#1DB954', secondary: '#E8F5E9', accent: '#2E7D32' },
+    dark: { primary: '#3D5A3D', secondary: '#1F3D1F', accent: '#5A8A5A' },
+  },
+};
 
 export const Colors = {
   light: {
@@ -26,6 +115,11 @@ export const Colors = {
     tabIconSelected: tintColorDark,
   },
 };
+
+// Helper function to get theme color
+export function getThemeColor(colorTheme: ColorThemeType): string {
+  return ColorThemes[colorTheme];
+}
 
 export const Fonts = Platform.select({
   ios: {

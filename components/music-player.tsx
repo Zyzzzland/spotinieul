@@ -1,27 +1,16 @@
-import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Image,
-  Dimensions,
-  ActivityIndicator,
-  Alert,
-} from 'react-native';
 import { useMusic } from '@/contexts/music-context';
+import { useAppColors, useThemeColors } from '@/hooks/use-theme-color';
 import { Ionicons } from '@expo/vector-icons';
 import Slider from '@react-native-community/slider';
-import { useColorScheme } from '@/hooks/use-color-scheme';
-import { Colors } from '@/constants/theme';
-
-// Conditionally import CastButton
-let CastButton: any = null;
-try {
-  CastButton = require('react-native-google-cast').CastButton;
-} catch (e) {
-  // Google Cast not available in Expo Go
-}
+import React from 'react';
+import {
+    Dimensions,
+    Image,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
+} from 'react-native';
 
 const { width } = Dimensions.get('window');
 
@@ -34,14 +23,10 @@ export function MusicPlayer() {
     seekTo,
     toggleRepeat,
     toggleShuffle,
-    isCastConnected,
-    castDeviceName,
-    castCurrentSong,
   } = useMusic();
 
-  const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme ?? 'light'];
-  const [isCasting, setIsCasting] = useState(false);
+  const colors = useAppColors();
+  const themeColors = useThemeColors();
 
   const { currentSong, isPlaying, position, duration, repeatMode, shuffleMode } = playbackState;
 
@@ -55,46 +40,8 @@ export function MusicPlayer() {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const handleCastPress = async () => {
-    if (!currentSong) return;
-    
-    if (!isCastConnected) {
-      Alert.alert('Not Connected', 'Please connect to a Cast device first using the Cast button.');
-      return;
-    }
-
-    setIsCasting(true);
-    try {
-      await castCurrentSong();
-    } catch (error) {
-      console.error('Error casting:', error);
-      Alert.alert('Cast Error', 'Failed to cast music. Please try again.');
-    } finally {
-      setIsCasting(false);
-    }
-  };
-
-
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      {/* Cast Button */}
-      <View style={styles.castContainer}>
-        {CastButton ? (
-          <View style={styles.castButtonWrapper}>
-            <CastButton style={styles.castButton} />
-            {isCastConnected && castDeviceName && (
-              <Text style={[styles.castDeviceText, { color: '#1DB954' }]}>
-                🔊 {castDeviceName}
-              </Text>
-            )}
-          </View>
-        ) : (
-          <View style={styles.castUnavailable}>
-            <Text style={styles.castUnavailableText}>Cast unavailable in Expo Go</Text>
-          </View>
-        )}
-      </View>
-
       {/* Album Art */}
       <View style={styles.albumArtContainer}>
         {currentSong.albumArt ? (
@@ -125,9 +72,9 @@ export function MusicPlayer() {
           maximumValue={duration || 1}
           value={position}
           onSlidingComplete={seekTo}
-          minimumTrackTintColor="#1DB954"
+          minimumTrackTintColor={themeColors.primary}
           maximumTrackTintColor={colors.icon + '40'}
-          thumbTintColor="#1DB954"
+          thumbTintColor={themeColors.primary}
         />
         <Text style={[styles.timeText, { color: colors.icon }]}>{formatTime(duration)}</Text>
       </View>
@@ -137,51 +84,55 @@ export function MusicPlayer() {
         <View style={styles.secondaryControls}>
           <TouchableOpacity
             onPress={toggleShuffle}
-            style={[styles.iconButton, shuffleMode && styles.activeButton]}
+            style={[
+              styles.iconButton,
+              shuffleMode && { backgroundColor: themeColors.primaryRgba(0.1) },
+            ]}
           >
             <Ionicons
               name="shuffle"
               size={24}
-              color={shuffleMode ? '#1DB954' : colors.icon}
+              color={shuffleMode ? themeColors.primary : colors.icon}
             />
           </TouchableOpacity>
 
-          {/* Cast current song button */}
-          {isCastConnected && (
-            <TouchableOpacity
-              onPress={handleCastPress}
-              style={[styles.iconButton, styles.castActionButton]}
-              disabled={isCasting}
-            >
-              {isCasting ? (
-                <ActivityIndicator size="small" color="#1DB954" />
-              ) : (
-                <Ionicons name="wifi" size={24} color="#1DB954" />
-              )}
-            </TouchableOpacity>
-          )}
-
           <TouchableOpacity
             onPress={toggleRepeat}
-            style={[styles.iconButton, repeatMode !== 'off' && styles.activeButton]}
+            style={[
+              styles.iconButton,
+              repeatMode !== 'off' && { backgroundColor: themeColors.primaryRgba(0.1) },
+            ]}
           >
             <Ionicons
               name={repeatMode === 'one' ? 'repeat-outline' : 'repeat'}
               size={24}
-              color={repeatMode !== 'off' ? '#1DB954' : colors.icon}
+              color={repeatMode !== 'off' ? themeColors.primary : colors.icon}
             />
           </TouchableOpacity>
         </View>
 
         <View style={styles.mainControls}>
           <TouchableOpacity onPress={previousSong} style={styles.controlButton}>
-            <View style={styles.controlButtonCircle}>
+            <View
+              style={[
+                styles.controlButtonCircle,
+                { backgroundColor: themeColors.primaryDark },
+              ]}
+            >
               <Ionicons name="play-skip-back" size={28} color="#fff" />
             </View>
           </TouchableOpacity>
 
           <TouchableOpacity onPress={togglePlayPause} style={styles.playButton}>
-            <View style={styles.playButtonCircle}>
+            <View
+              style={[
+                styles.playButtonCircle,
+                {
+                  backgroundColor: themeColors.primary,
+                  shadowColor: themeColors.primary,
+                },
+              ]}
+            >
               <Ionicons
                 name={isPlaying ? 'pause' : 'play'}
                 size={32}
@@ -191,7 +142,12 @@ export function MusicPlayer() {
           </TouchableOpacity>
 
           <TouchableOpacity onPress={nextSong} style={styles.controlButton}>
-            <View style={styles.controlButtonCircle}>
+            <View
+              style={[
+                styles.controlButtonCircle,
+                { backgroundColor: themeColors.primaryDark },
+              ]}
+            >
               <Ionicons name="play-skip-forward" size={28} color="#fff" />
             </View>
           </TouchableOpacity>
@@ -206,37 +162,6 @@ const styles = StyleSheet.create({
     padding: 24,
     paddingTop: 60,
     alignItems: 'center',
-  },
-  castContainer: {
-    width: '100%',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  castButtonWrapper: {
-    alignItems: 'center',
-    gap: 8,
-  },
-  castButton: {
-    width: 36,
-    height: 36,
-    tintColor: '#1DB954',
-  },
-  castDeviceText: {
-    fontSize: 13,
-    fontWeight: '600',
-  },
-  castUnavailable: {
-    backgroundColor: 'rgba(255, 193, 7, 0.1)',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 12,
-  },
-  castUnavailableText: {
-    fontSize: 11,
-    color: '#FFC107',
-  },
-  castActionButton: {
-    backgroundColor: 'rgba(29, 185, 84, 0.15)',
   },
   albumArtContainer: {
     width: width - 80,
@@ -310,9 +235,6 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 20,
   },
-  activeButton: {
-    backgroundColor: 'rgba(29, 185, 84, 0.1)',
-  },
   controlButton: {
     padding: 8,
   },
@@ -320,7 +242,7 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: 'rgba(29, 185, 84, 0.9)',
+    // backgroundColor will be set dynamically
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -331,10 +253,9 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: '#1DB954',
+    // backgroundColor and shadowColor will be set dynamically
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#1DB954',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.4,
     shadowRadius: 8,

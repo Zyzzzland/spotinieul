@@ -5,24 +5,24 @@ import { View } from 'react-native';
 import { HapticTab } from '@/components/haptic-tab';
 import { MiniPlayer } from '@/components/mini-player';
 import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Colors } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
-import { Fontisto } from '@expo/vector-icons';
+import { useAppColors, useThemeColor } from '@/hooks/use-theme-color';
+import { Fontisto, Ionicons } from '@expo/vector-icons';
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
+  const colors = useAppColors();
+  const themeColor = useThemeColor();
 
   return (
     <View style={{ flex: 1 }}>
       <Tabs
         screenOptions={{
-          tabBarActiveTintColor: '#1DB954',
+          tabBarActiveTintColor: themeColor,
           headerShown: false,
           tabBarButton: HapticTab,
           tabBarStyle: {
-            backgroundColor: Colors[colorScheme ?? 'light'].background,
+            backgroundColor: colors.background,
             borderTopWidth: 1,
-            borderTopColor: '#282828',
+            borderTopColor: colors.icon + '40',
             height: 70,
             paddingBottom: 10,
             paddingTop: 10,
@@ -39,14 +39,14 @@ export default function TabLayout() {
           name="library"
           options={{
             title: 'Library',
-            tabBarIcon: ({ color }) => <Fontisto name="music-note" size={22} color={color} />,
+            tabBarIcon: ({ color }) => <Ionicons size={28} name="library" color={color} />,
           }}
         />
         <Tabs.Screen
           name="playlists"
           options={{
             title: 'Playlists',
-            tabBarIcon: ({ color }) => <Fontisto name="play-list" size={18} color={color} />,
+            tabBarIcon: ({ color }) => <Ionicons size={28} name="list" color={color} />,
           }}
         />
         <Tabs.Screen
@@ -56,7 +56,13 @@ export default function TabLayout() {
             tabBarIcon: ({ color }) => <Fontisto size={22} name="pingdom" color={color} />,
           }}
         />
-        
+        <Tabs.Screen
+          name="parameters"
+          options={{
+            title: 'Parameters',
+            tabBarIcon: ({ color }) => <Ionicons size={28} name="settings" color={color} />,
+          }}
+        />
       </Tabs>
       <MiniPlayer />
     </View>

@@ -1,25 +1,24 @@
+import { useFlashcards } from '@/contexts/flashcard-context';
+import { useAppColors, useThemeColors } from '@/hooks/use-theme-color';
+import type { Topic } from '@/types/flashcard';
+import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  FlatList,
-  TouchableOpacity,
-  Alert,
-  TextInput,
-  Modal,
+    Alert,
+    FlatList,
+    Modal,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from 'react-native';
-import { useRouter } from 'expo-router';
-import { useFlashcards } from '@/contexts/flashcard-context';
-import { Ionicons } from '@expo/vector-icons';
-import { useColorScheme } from '@/hooks/use-color-scheme';
-import { Colors } from '@/constants/theme';
-import type { Topic } from '@/types/flashcard';
 
 export default function FlashcardsScreen() {
   const { topics, createTopic, deleteTopic } = useFlashcards();
-  const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme ?? 'light'];
+  const colors = useAppColors();
+  const themeColors = useThemeColors();
   const router = useRouter();
 
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -60,8 +59,8 @@ export default function FlashcardsScreen() {
           style={styles.topicTouchable}
           onPress={() => router.push(`/topic/${item.id}` as any)}
         >
-          <View style={[styles.topicIcon, { backgroundColor: '#1DB954' + '30' }]}>
-            <Ionicons name="folder" size={32} color="#1DB954" />
+          <View style={[styles.topicIcon, { backgroundColor: themeColors.primaryLight }]}>
+            <Ionicons name="folder" size={32} color={themeColors.primary} />
           </View>
 
           <View style={styles.topicInfo}>
@@ -90,7 +89,7 @@ export default function FlashcardsScreen() {
           }}
           style={styles.studyButton}
         >
-          <Ionicons name="school" size={24} color="#1DB954" />
+          <Ionicons name="school" size={24} color={themeColors.primary} />
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -112,7 +111,7 @@ export default function FlashcardsScreen() {
         <Text style={[styles.headerTitle, { color: colors.text }]}>Flashcards</Text>
         <TouchableOpacity
           onPress={() => setShowCreateModal(true)}
-          style={[styles.addButton, { backgroundColor: '#1DB954' }]}
+          style={[styles.addButton, { backgroundColor: themeColors.primary }]}
         >
           <Ionicons name="add" size={20} color="#fff" />
           <Text style={styles.addButtonText}>New Topic</Text>
@@ -183,7 +182,7 @@ export default function FlashcardsScreen() {
               </TouchableOpacity>
 
               <TouchableOpacity
-                style={[styles.modalButton, styles.createButton]}
+                style={[styles.modalButton, styles.createButton, { backgroundColor: themeColors.primary }]}
                 onPress={handleCreateTopic}
               >
                 <Text style={styles.buttonText}>Create</Text>
@@ -330,7 +329,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#666',
   },
   createButton: {
-    backgroundColor: '#1DB954',
+    // backgroundColor will be set dynamically
   },
   buttonText: {
     color: '#fff',

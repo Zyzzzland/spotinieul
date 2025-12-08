@@ -59,8 +59,7 @@ spotinieul/
 │   │   ├── index.tsx    # Home screen
 │   │   ├── library.tsx  # Song library & upload
 │   │   ├── playlists.tsx # Playlist management
-│   │   ├── explore.tsx  # Explore/search
-│   │   └── cast.tsx     # Google Cast integration
+│   │   └── flashcards.tsx # Flashcards feature
 │   ├── playlist/
 │   │   └── [id].tsx     # Playlist detail screen
 │   ├── player.tsx       # Full-screen music player

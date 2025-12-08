@@ -1,26 +1,25 @@
+import { useMusic } from '@/contexts/music-context';
+import { useAppColors, useThemeColors } from '@/hooks/use-theme-color';
+import type { Playlist } from '@/types/music';
+import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  FlatList,
-  TouchableOpacity,
-  Alert,
-  TextInput,
-  Modal,
-  Image,
+    Alert,
+    FlatList,
+    Image,
+    Modal,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from 'react-native';
-import { useRouter } from 'expo-router';
-import { useMusic } from '@/contexts/music-context';
-import { Ionicons } from '@expo/vector-icons';
-import { useColorScheme } from '@/hooks/use-color-scheme';
-import { Colors } from '@/constants/theme';
-import type { Playlist } from '@/types/music';
 
 export default function PlaylistsScreen() {
   const { playlists, createPlaylist, deletePlaylist, playPlaylist, getSongById } = useMusic();
-  const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme ?? 'light'];
+  const colors = useAppColors();
+  const themeColors = useThemeColors();
   const router = useRouter();
 
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -108,7 +107,7 @@ export default function PlaylistsScreen() {
           }}
           style={styles.playButton}
         >
-          <Ionicons name="play-circle" size={44} color="#1DB954" />
+          <Ionicons name="play-circle" size={44} color={themeColors.primary} />
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -130,7 +129,7 @@ export default function PlaylistsScreen() {
         <Text style={[styles.headerTitle, { color: colors.text }]}>Playlists</Text>
         <TouchableOpacity
           onPress={() => setShowCreateModal(true)}
-          style={[styles.addButton, { backgroundColor: '#1DB954' }]}
+          style={[styles.addButton, { backgroundColor: themeColors.primary }]}
         >
           <Ionicons name="add" size={20} color="#fff" />
           <Text style={styles.addButtonText}>New Playlist</Text>
@@ -201,7 +200,7 @@ export default function PlaylistsScreen() {
               </TouchableOpacity>
 
               <TouchableOpacity
-                style={[styles.modalButton, styles.createButton]}
+                style={[styles.modalButton, styles.createButton, { backgroundColor: themeColors.primary }]}
                 onPress={handleCreatePlaylist}
               >
                 <Text style={styles.buttonText}>Create</Text>
@@ -353,7 +352,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#666',
   },
   createButton: {
-    backgroundColor: '#1DB954',
+    // backgroundColor will be set dynamically
   },
   buttonText: {
     color: '#fff',

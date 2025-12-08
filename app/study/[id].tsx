@@ -1,26 +1,25 @@
-import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Animated,
-  Modal,
-} from 'react-native';
-import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useFlashcards } from '@/contexts/flashcard-context';
-import { Ionicons } from '@expo/vector-icons';
-import { useColorScheme } from '@/hooks/use-color-scheme';
-import { Colors } from '@/constants/theme';
+import { useAppColors, useThemeColors } from '@/hooks/use-theme-color';
 import type { Flashcard } from '@/types/flashcard';
+import { Ionicons } from '@expo/vector-icons';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import React, { useEffect, useState } from 'react';
+import {
+    Animated,
+    Modal,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
+} from 'react-native';
 
 export default function StudyModeScreen() {
   const { id } = useLocalSearchParams();
   const router = useRouter();
   const { getTopicById, markFlashcardReviewed } = useFlashcards();
 
-  const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme ?? 'light'];
+  const colors = useAppColors();
+  const themeColors = useThemeColors();
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
@@ -158,7 +157,7 @@ export default function StudyModeScreen() {
         >
           <View style={styles.startModalOverlay}>
             <View style={[styles.startModalContent, { backgroundColor: colors.background }]}>
-              <Ionicons name="school" size={64} color="#1DB954" />
+              <Ionicons name="school" size={64} color={themeColors.primary} />
               <Text style={[styles.startModalTitle, { color: colors.text }]}>
                 Choose Starting Side
               </Text>
@@ -167,7 +166,7 @@ export default function StudyModeScreen() {
               </Text>
 
               <TouchableOpacity
-                style={[styles.startOptionButton, { backgroundColor: '#1DB954' }]}
+                style={[styles.startOptionButton, { backgroundColor: themeColors.primary }]}
                 onPress={() => handleStartStudy(true)}
               >
                 <Ionicons name="document-text" size={28} color="#fff" />
@@ -221,7 +220,7 @@ export default function StudyModeScreen() {
         <View
           style={[
             styles.progressBar,
-            { width: `${progress}%`, backgroundColor: '#1DB954' },
+            { width: `${progress}%`, backgroundColor: themeColors.primary },
           ]}
         />
       </View>
@@ -240,7 +239,7 @@ export default function StudyModeScreen() {
               style={[
                 styles.card,
                 {
-                  backgroundColor: startWithFront ? '#2E2E2E' : '#1DB954',
+                  backgroundColor: startWithFront ? '#2E2E2E' : themeColors.primary,
                   transform: [{ rotateY: frontInterpolate }],
                   opacity: frontOpacity,
                 },
@@ -262,7 +261,7 @@ export default function StudyModeScreen() {
                 styles.card,
                 styles.cardBack,
                 {
-                  backgroundColor: startWithFront ? '#1DB954' : '#2E2E2E',
+                  backgroundColor: startWithFront ? themeColors.primary : '#2E2E2E',
                   transform: [{ rotateY: backInterpolate }],
                   opacity: backOpacity,
                 },
@@ -313,6 +312,7 @@ export default function StudyModeScreen() {
           style={[
             styles.navButton,
             styles.nextButton,
+            !isLastCard && { backgroundColor: themeColors.primary },
             isLastCard && styles.disabledButton,
           ]}
         >
@@ -454,7 +454,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#666',
   },
   nextButton: {
-    backgroundColor: '#1DB954',
+    // backgroundColor will be set dynamically
   },
   disabledButton: {
     backgroundColor: '#3a3a3a',

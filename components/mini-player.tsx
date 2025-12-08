@@ -1,22 +1,21 @@
+import { useMusic } from '@/contexts/music-context';
+import { useAppColors, useThemeColors } from '@/hooks/use-theme-color';
+import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import React from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Image,
-  Pressable,
+    Image,
+    Pressable,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from 'react-native';
-import { useMusic } from '@/contexts/music-context';
-import { Ionicons } from '@expo/vector-icons';
-import { useColorScheme } from '@/hooks/use-color-scheme';
-import { Colors } from '@/constants/theme';
-import { useRouter } from 'expo-router';
 
 export function MiniPlayer() {
-  const { playbackState, togglePlayPause, nextSong, isCastConnected, castDeviceName } = useMusic();
-  const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme ?? 'light'];
+  const { playbackState, togglePlayPause, nextSong } = useMusic();
+  const colors = useAppColors();
+  const themeColors = useThemeColors();
   const router = useRouter();
 
   const { currentSong, isPlaying, position, duration } = playbackState;
@@ -35,7 +34,10 @@ export function MiniPlayer() {
       {/* Progress Bar */}
       <View style={styles.progressBar}>
         <View
-          style={[styles.progress, { width: `${progress}%`, backgroundColor: '#1DB954' }]}
+          style={[
+            styles.progress,
+            { width: `${progress}%`, backgroundColor: themeColors.primary },
+          ]}
         />
       </View>
 
@@ -51,16 +53,11 @@ export function MiniPlayer() {
 
         {/* Song Info */}
         <View style={styles.songInfo}>
-          <View style={styles.titleRow}>
-            <Text style={[styles.title, { color: colors.text }]} numberOfLines={1}>
-              {currentSong.title}
-            </Text>
-            {isCastConnected && (
-              <Ionicons name="wifi" size={12} color="#1DB954" style={styles.castIcon} />
-            )}
-          </View>
+          <Text style={[styles.title, { color: colors.text }]} numberOfLines={1}>
+            {currentSong.title}
+          </Text>
           <Text style={[styles.artist, { color: colors.icon }]} numberOfLines={1}>
-            {isCastConnected && castDeviceName ? `Casting to ${castDeviceName}` : currentSong.artist}
+            {currentSong.artist}
           </Text>
         </View>
 
@@ -73,7 +70,12 @@ export function MiniPlayer() {
             }}
             style={styles.playButton}
           >
-            <View style={styles.playButtonCircle}>
+            <View
+              style={[
+                styles.playButtonCircle,
+                { backgroundColor: themeColors.primary },
+              ]}
+            >
               <Ionicons
                 name={isPlaying ? 'pause' : 'play'}
                 size={18}
@@ -89,7 +91,12 @@ export function MiniPlayer() {
             }}
             style={styles.nextButton}
           >
-            <View style={styles.nextButtonCircle}>
+            <View
+              style={[
+                styles.nextButtonCircle,
+                { backgroundColor: themeColors.primaryRgba(0.8) },
+              ]}
+            >
               <Ionicons name="play-skip-forward" size={16} color="#fff" />
             </View>
           </TouchableOpacity>
@@ -138,19 +145,10 @@ const styles = StyleSheet.create({
     flex: 1,
     marginLeft: 12,
   },
-  titleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
   title: {
     fontSize: 14,
     fontWeight: '600',
     marginBottom: 2,
-    flex: 1,
-  },
-  castIcon: {
-    marginLeft: 4,
   },
   artist: {
     fontSize: 12,
@@ -167,7 +165,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#1DB954',
+    // backgroundColor will be set dynamically
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -178,7 +176,7 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: 'rgba(29, 185, 84, 0.8)',
+    // backgroundColor will be set dynamically
     justifyContent: 'center',
     alignItems: 'center',
   },

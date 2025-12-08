@@ -1,22 +1,21 @@
+import { useMusic } from '@/contexts/music-context';
+import { useAppColors, useThemeColors } from '@/hooks/use-theme-color';
+import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import React from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  Image,
+    Image,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from 'react-native';
-import { useRouter } from 'expo-router';
-import { useMusic } from '@/contexts/music-context';
-import { Ionicons } from '@expo/vector-icons';
-import { useColorScheme } from '@/hooks/use-color-scheme';
-import { Colors } from '@/constants/theme';
 
 export default function HomeScreen() {
   const { songs, playlists, playbackState, playSong, playPlaylist, getSongById } = useMusic();
-  const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme ?? 'light'];
+  const colors = useAppColors();
+  const themeColors = useThemeColors();
   const router = useRouter();
 
   const recentSongs = songs.slice(-5).reverse();
@@ -59,7 +58,7 @@ export default function HomeScreen() {
             style={[styles.quickActionCard, { backgroundColor: colors.icon + '15' }]}
             onPress={() => router.push('/(tabs)/library')}
           >
-            <Ionicons name="musical-notes" size={32} color="#1DB954" />
+            <Ionicons name="musical-notes" size={32} color={themeColors.primary} />
             <Text style={[styles.quickActionText, { color: colors.text }]}>
               My Library
             </Text>
@@ -72,7 +71,7 @@ export default function HomeScreen() {
             style={[styles.quickActionCard, { backgroundColor: colors.icon + '15' }]}
             onPress={() => router.push('/(tabs)/playlists')}
           >
-            <Ionicons name="list" size={32} color="#1DB954" />
+            <Ionicons name="list" size={32} color={themeColors.primary} />
             <Text style={[styles.quickActionText, { color: colors.text }]}>
               Playlists
             </Text>
@@ -90,7 +89,7 @@ export default function HomeScreen() {
                 Recently Added
               </Text>
               <TouchableOpacity onPress={() => router.push('/(tabs)/library')}>
-                <Text style={styles.seeAll}>See All</Text>
+                <Text style={[styles.seeAll, { color: themeColors.primary }]}>See All</Text>
               </TouchableOpacity>
             </View>
 
@@ -114,7 +113,7 @@ export default function HomeScreen() {
                       </View>
                     )}
                     <View style={styles.songCardPlayOverlay}>
-                      <Ionicons name="play-circle" size={40} color="#1DB954" />
+                      <Ionicons name="play-circle" size={40} color={themeColors.primary} />
                     </View>
                   </View>
                   <Text style={[styles.songCardTitle, { color: colors.text }]} numberOfLines={2}>
@@ -137,7 +136,7 @@ export default function HomeScreen() {
                 Your Playlists
               </Text>
               <TouchableOpacity onPress={() => router.push('/(tabs)/playlists')}>
-                <Text style={styles.seeAll}>See All</Text>
+                <Text style={[styles.seeAll, { color: themeColors.primary }]}>See All</Text>
               </TouchableOpacity>
             </View>
 
@@ -172,7 +171,7 @@ export default function HomeScreen() {
                       }}
                       style={styles.playlistPlayButton}
                     >
-                      <Ionicons name="play-circle" size={40} color="#1DB954" />
+                      <Ionicons name="play-circle" size={40} color={themeColors.primary} />
                     </TouchableOpacity>
                   </TouchableOpacity>
                 );
@@ -192,7 +191,7 @@ export default function HomeScreen() {
               Upload your first song or create a playlist to get started
             </Text>
             <TouchableOpacity
-              style={styles.emptyButton}
+              style={[styles.emptyButton, { backgroundColor: themeColors.primary }]}
               onPress={() => router.push('/(tabs)/library')}
             >
               <Text style={styles.emptyButtonText}>Add Songs</Text>
@@ -263,8 +262,8 @@ const styles = StyleSheet.create({
   },
   seeAll: {
     fontSize: 14,
-    color: '#1DB954',
     fontWeight: '600',
+    // color will be set dynamically
   },
   horizontalList: {
     paddingHorizontal: 16,
@@ -360,7 +359,6 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   emptyButton: {
-    backgroundColor: '#1DB954',
     paddingVertical: 14,
     paddingHorizontal: 32,
     borderRadius: 24,

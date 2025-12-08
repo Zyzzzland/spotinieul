@@ -1,20 +1,19 @@
+import { useMusic } from '@/contexts/music-context';
+import { useAppColors, useThemeColors } from '@/hooks/use-theme-color';
+import type { Song } from '@/types/music';
+import { Ionicons } from '@expo/vector-icons';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  FlatList,
-  TouchableOpacity,
-  Alert,
-  Image,
-  Modal,
+    Alert,
+    FlatList,
+    Image,
+    Modal,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from 'react-native';
-import { useRouter, useLocalSearchParams } from 'expo-router';
-import { useMusic } from '@/contexts/music-context';
-import { Ionicons } from '@expo/vector-icons';
-import { useColorScheme } from '@/hooks/use-color-scheme';
-import { Colors } from '@/constants/theme';
-import type { Song } from '@/types/music';
 
 export default function PlaylistDetailScreen() {
   const { id } = useLocalSearchParams();
@@ -29,8 +28,8 @@ export default function PlaylistDetailScreen() {
     playSong,
   } = useMusic();
   
-  const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme ?? 'light'];
+  const colors = useAppColors();
+  const themeColors = useThemeColors();
 
   const [showAddSongModal, setShowAddSongModal] = useState(false);
 
@@ -121,7 +120,7 @@ export default function PlaylistDetailScreen() {
         onPress={() => handlePlaySong(item)}
         style={styles.playButton}
       >
-        <Ionicons name="play-circle" size={36} color="#1DB954" />
+        <Ionicons name="play-circle" size={36} color={themeColors.primary} />
       </TouchableOpacity>
 
       <TouchableOpacity
@@ -158,7 +157,7 @@ export default function PlaylistDetailScreen() {
         </Text>
       </View>
 
-      <View style={styles.addSongIconButton}>
+      <View style={[styles.addSongIconButton, { backgroundColor: themeColors.primary }]}>
         <Ionicons name="add" size={20} color="#fff" />
       </View>
     </TouchableOpacity>
@@ -194,7 +193,7 @@ export default function PlaylistDetailScreen() {
 
         <View style={styles.actionButtons}>
           <TouchableOpacity
-            style={styles.playAllButton}
+            style={[styles.playAllButton, { backgroundColor: themeColors.primary }]}
             onPress={handlePlayPlaylist}
           >
             <Ionicons name="play" size={20} color="#fff" />
@@ -326,7 +325,6 @@ const styles = StyleSheet.create({
   playAllButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#1DB954',
     paddingVertical: 12,
     paddingHorizontal: 24,
     borderRadius: 24,
@@ -401,7 +399,6 @@ const styles = StyleSheet.create({
     padding: 4,
   },
   addSongIconButton: {
-    backgroundColor: '#1DB954',
     width: 32,
     height: 32,
     borderRadius: 16,

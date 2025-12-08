@@ -1,27 +1,26 @@
-import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  FlatList,
-  TouchableOpacity,
-  Image,
-  Alert,
-  TextInput,
-  Modal,
-} from 'react-native';
+import { useMusic } from '@/contexts/music-context';
+import { useAppColors, useThemeColors } from '@/hooks/use-theme-color';
+import type { Song } from '@/types/music';
+import { Ionicons } from '@expo/vector-icons';
 import * as DocumentPicker from 'expo-document-picker';
 import * as FileSystem from 'expo-file-system/legacy';
-import { useMusic } from '@/contexts/music-context';
-import { Ionicons } from '@expo/vector-icons';
-import { useColorScheme } from '@/hooks/use-color-scheme';
-import { Colors } from '@/constants/theme';
-import type { Song } from '@/types/music';
+import React, { useState } from 'react';
+import {
+    Alert,
+    FlatList,
+    Image,
+    Modal,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
+} from 'react-native';
 
 export default function LibraryScreen() {
   const { songs, addSong, deleteSong, playSong } = useMusic();
-  const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme ?? 'light'];
+  const colors = useAppColors();
+  const themeColors = useThemeColors();
 
   const [isUploading, setIsUploading] = useState(false);
   const [showMetadataModal, setShowMetadataModal] = useState(false);
@@ -164,7 +163,7 @@ export default function LibraryScreen() {
         onPress={() => playSong(item, songs, songs.indexOf(item))}
         style={styles.playButton}
       >
-        <Ionicons name="play-circle" size={36} color="#1DB954" />
+        <Ionicons name="play-circle" size={36} color={themeColors.primary} />
       </TouchableOpacity>
 
       <TouchableOpacity
@@ -185,7 +184,7 @@ export default function LibraryScreen() {
         <Text style={[styles.headerTitle, { color: colors.text }]}>My Library</Text>
         <TouchableOpacity
           onPress={pickAudioFile}
-          style={[styles.addButton, { backgroundColor: '#1DB954' }]}
+          style={[styles.addButton, { backgroundColor: themeColors.primary }]}
           disabled={isUploading}
         >
           <Ionicons name="add" size={20} color="#fff" />
@@ -259,7 +258,7 @@ export default function LibraryScreen() {
               </TouchableOpacity>
 
               <TouchableOpacity
-                style={[styles.modalButton, styles.saveButton]}
+                style={[styles.modalButton, styles.saveButton, { backgroundColor: themeColors.primary }]}
                 onPress={saveAudioFile}
                 disabled={isUploading}
               >
@@ -404,7 +403,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#666',
   },
   saveButton: {
-    backgroundColor: '#1DB954',
+    // backgroundColor will be set dynamically
   },
   buttonText: {
     color: '#fff',

@@ -1,29 +1,28 @@
+import { useFlashcards } from '@/contexts/flashcard-context';
+import { useAppColors, useThemeColors } from '@/hooks/use-theme-color';
+import type { Flashcard } from '@/types/flashcard';
+import { Ionicons } from '@expo/vector-icons';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  FlatList,
-  TouchableOpacity,
-  Alert,
-  TextInput,
-  Modal,
-  ScrollView,
+    Alert,
+    FlatList,
+    Modal,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from 'react-native';
-import { useRouter, useLocalSearchParams } from 'expo-router';
-import { useFlashcards } from '@/contexts/flashcard-context';
-import { Ionicons } from '@expo/vector-icons';
-import { useColorScheme } from '@/hooks/use-color-scheme';
-import { Colors } from '@/constants/theme';
-import type { Flashcard } from '@/types/flashcard';
 
 export default function TopicDetailScreen() {
   const { id } = useLocalSearchParams();
   const router = useRouter();
   const { getTopicById, addFlashcard, deleteFlashcard, updateFlashcard } = useFlashcards();
 
-  const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme ?? 'light'];
+  const colors = useAppColors();
+  const themeColors = useThemeColors();
 
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -112,7 +111,7 @@ export default function TopicDetailScreen() {
     return (
       <View style={[styles.cardContainer, { backgroundColor: colors.background }]}>
         <TouchableOpacity
-          style={[styles.card, { backgroundColor: isFlipped ? '#1DB954' : '#2E2E2E' }]}
+          style={[styles.card, { backgroundColor: isFlipped ? themeColors.primary : '#2E2E2E' }]}
           onPress={() => toggleCardFlip(item.id)}
           activeOpacity={0.8}
         >
@@ -159,7 +158,7 @@ export default function TopicDetailScreen() {
         </Text>
         <TouchableOpacity
           onPress={() => setShowCreateModal(true)}
-          style={[styles.addButton, { backgroundColor: '#1DB954' }]}
+          style={[styles.addButton, { backgroundColor: themeColors.primary }]}
         >
           <Ionicons name="add" size={24} color="#fff" />
         </TouchableOpacity>
@@ -180,7 +179,7 @@ export default function TopicDetailScreen() {
         {topic.flashcards.length > 0 && (
           <TouchableOpacity
             onPress={() => router.push(`/study/${topic.id}` as any)}
-            style={[styles.studyButton, { backgroundColor: '#1DB954' }]}
+            style={[styles.studyButton, { backgroundColor: themeColors.primary }]}
           >
             <Ionicons name="school" size={20} color="#fff" />
             <Text style={styles.studyButtonText}>Study Mode</Text>
@@ -260,7 +259,7 @@ export default function TopicDetailScreen() {
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                  style={[styles.modalButton, styles.createButton]}
+                  style={[styles.modalButton, styles.createButton, { backgroundColor: themeColors.primary }]}
                   onPress={handleCreateFlashcard}
                 >
                   <Text style={styles.buttonText}>Create</Text>
@@ -325,7 +324,7 @@ export default function TopicDetailScreen() {
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                  style={[styles.modalButton, styles.createButton]}
+                  style={[styles.modalButton, styles.createButton, { backgroundColor: themeColors.primary }]}
                   onPress={handleEditFlashcard}
                 >
                   <Text style={styles.buttonText}>Save</Text>
@@ -521,7 +520,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#666',
   },
   createButton: {
-    backgroundColor: '#1DB954',
+    // backgroundColor will be set dynamically
   },
   buttonText: {
     color: '#fff',
