@@ -5,15 +5,15 @@ import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
-    Alert,
-    FlatList,
-    Modal,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Alert,
+  FlatList,
+  Modal,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 
 export default function TopicDetailScreen() {
@@ -109,9 +109,9 @@ export default function TopicDetailScreen() {
     const isFlipped = flippedCards.has(item.id);
 
     return (
-      <View style={[styles.cardContainer, { backgroundColor: colors.background }]}>
+      <View style={[styles.cardContainer]}>
         <TouchableOpacity
-          style={[styles.card, { backgroundColor: isFlipped ? themeColors.primary : '#2E2E2E' }]}
+          style={[styles.card, { backgroundColor: isFlipped ? themeColors.primary : themeColors.backgroundCard,borderColor: themeColors.primary, borderWidth: 1 }]}
           onPress={() => toggleCardFlip(item.id)}
           activeOpacity={0.8}
         >
@@ -119,7 +119,7 @@ export default function TopicDetailScreen() {
             <Text style={styles.cardLabel}>
               {isFlipped ? 'Back' : 'Front'}
             </Text>
-            <Text style={styles.cardText}>
+            <Text style={[styles.cardText, { color: isFlipped ? themeColors.text : themeColors.text }]}>
               {isFlipped ? item.back : item.front}
             </Text>
             <Text style={styles.tapHint}>
@@ -131,7 +131,7 @@ export default function TopicDetailScreen() {
         <View style={styles.cardActions}>
           <TouchableOpacity
             onPress={() => openEditModal(item)}
-            style={[styles.actionButton, { backgroundColor: '#3498DB' }]}
+            style={[styles.actionButton, { backgroundColor: themeColors.primary }]}
           >
             <Ionicons name="pencil" size={18} color="#fff" />
           </TouchableOpacity>
@@ -407,11 +407,7 @@ const styles = StyleSheet.create({
     padding: 24,
     minHeight: 180,
     justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+    borderStyle: 'dashed'
   },
   cardContent: {
     alignItems: 'center',
@@ -425,7 +421,6 @@ const styles = StyleSheet.create({
     opacity: 0.8,
   },
   cardText: {
-    color: '#fff',
     fontSize: 18,
     fontWeight: '500',
     textAlign: 'center',

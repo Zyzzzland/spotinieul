@@ -5,12 +5,12 @@ import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
-    Animated,
-    Modal,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Animated,
+  Modal,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 
 export default function StudyModeScreen() {
@@ -239,9 +239,11 @@ export default function StudyModeScreen() {
               style={[
                 styles.card,
                 {
-                  backgroundColor: startWithFront ? '#2E2E2E' : themeColors.primary,
+                  backgroundColor: startWithFront ? themeColors.backgroundCard : themeColors.primary,
                   transform: [{ rotateY: frontInterpolate }],
                   opacity: frontOpacity,
+                  borderColor: themeColors.primary, 
+                  borderWidth: 1
                 },
               ]}
             >
@@ -261,7 +263,7 @@ export default function StudyModeScreen() {
                 styles.card,
                 styles.cardBack,
                 {
-                  backgroundColor: startWithFront ? themeColors.primary : '#2E2E2E',
+                  backgroundColor: startWithFront ? themeColors.primary : themeColors.backgroundCard,
                   transform: [{ rotateY: backInterpolate }],
                   opacity: backOpacity,
                 },
@@ -287,7 +289,7 @@ export default function StudyModeScreen() {
           disabled={currentIndex === 0}
           style={[
             styles.navButton,
-            styles.previousButton,
+            { backgroundColor: themeColors.backgroundCard },
             currentIndex === 0 && styles.disabledButton,
           ]}
         >
@@ -393,11 +395,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backfaceVisibility: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4.65,
-    elevation: 8,
+    borderStyle: 'dashed'
   },
   cardBack: {
     position: 'absolute',
@@ -449,9 +447,6 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 12,
     gap: 8,
-  },
-  previousButton: {
-    backgroundColor: '#666',
   },
   nextButton: {
     // backgroundColor will be set dynamically

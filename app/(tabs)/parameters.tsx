@@ -19,17 +19,7 @@ export default function ParametersScreen() {
   const isDark = colorScheme === 'dark';
   const { colorTheme, setColorTheme } = useTheme();
 
-  const colorOptions: ColorThemeType[] = ['blue', 'red', 'pink', 'green', 'purple', 'orange', 'cyan', 'yellow'];
-  const colorLabels: Record<ColorThemeType, string> = {
-    blue: 'Bleu',
-    red: 'Rouge',
-    pink: 'Rose',
-    green: 'Vert',
-    purple: 'Violet',
-    orange: 'Orange',
-    cyan: 'Cyan',
-    yellow: 'Jaune',
-  };
+  const colorOptions: ColorThemeType[] = ['blue', 'red', 'pink', 'green', 'purple', 'orange', 'cyan', 'yellow','default'];
 
   const themeIcons: Record<ColorThemeType, keyof typeof Ionicons.glyphMap> = {
     blue: 'water',
@@ -40,6 +30,7 @@ export default function ParametersScreen() {
     orange: 'sunny',
     cyan: 'water-outline',
     yellow: 'star',
+    default: 'color-palette',
   };
 
   const getThemeAccentColor = (theme: ColorThemeType) => {
@@ -54,16 +45,16 @@ export default function ParametersScreen() {
         <View style={[styles.headerContainer, { borderBottomColor: getThemeAccentColor(colorTheme) + '30' }]}>
           <View style={styles.headerContent}>
             <Ionicons name="settings" size={32} color={getThemeAccentColor(colorTheme)} />
-            <Text style={[styles.headerTitle, { color: colors.text }]}>Paramètres</Text>
+            <Text style={[styles.headerTitle, { color: colors.text }]}>Parameters</Text>
           </View>
-          <Text style={[styles.headerSubtitle, { color: colors.icon }]}>Personnalisez votre expérience</Text>
+          <Text style={[styles.headerSubtitle, { color: colors.icon }]}>Customize your experience</Text>
         </View>
 
         {/* Theme Section */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Ionicons name="color-palette" size={24} color={getThemeAccentColor(colorTheme)} />
-            <Text style={[styles.sectionTitle, { color: colors.text }]}>Thème de couleur</Text>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>Theme</Text>
           </View>
 
           {/* Theme Preview Cards */}
@@ -75,7 +66,7 @@ export default function ParametersScreen() {
                   styles.themePreviewCard,
                   {
                     backgroundColor: colors.icon+'15',
-                    borderColor: colorTheme === theme ? getThemeAccentColor(theme) : getThemeAccentColor(colorTheme) + '30',
+                    borderColor: colorTheme == 'default' ? (colorTheme === theme ? getThemeAccentColor(theme)+ '30' : getThemeAccentColor(colorTheme)) :(colorTheme === theme ? getThemeAccentColor(theme) : getThemeAccentColor(colorTheme) + '30'),
                     borderWidth: colorTheme === theme ? 2 : 1,
                   },
                 ]}
@@ -88,7 +79,7 @@ export default function ParametersScreen() {
                   color={getThemeAccentColor(theme)}
                 />
                 <Text style={[styles.themePreviewLabel, { color: colors.text }]}>
-                  {colorLabels[theme]}
+                  {theme.charAt(0).toUpperCase() + theme.slice(1)}
                 </Text>
                 {colorTheme === theme && (
                   <View style={[styles.checkmark, { backgroundColor: getThemeAccentColor(theme) }]}>
@@ -104,13 +95,13 @@ export default function ParametersScreen() {
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Ionicons name="information-circle" size={24} color={getThemeAccentColor(colorTheme)} />
-            <Text style={[styles.sectionTitle, { color: colors.text }]}>À propos</Text>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>About</Text>
           </View>
 
           <View style={[styles.infoCard, { backgroundColor: colors.icon+'15', borderLeftColor: getThemeAccentColor(colorTheme) }]}>
             <View style={styles.infoCardHeader}>
               <Ionicons name="cube" size={20} color={getThemeAccentColor(colorTheme)} />
-              <Text style={[styles.infoLabel, { color: colors.icon }]}>Version de l'app</Text>
+              <Text style={[styles.infoLabel, { color: colors.icon }]}>App Version</Text>
             </View>
             <Text style={[styles.infoValue, { color: colors.text }]}>1.0.0</Text>
           </View>
@@ -118,10 +109,10 @@ export default function ParametersScreen() {
           <View style={[styles.infoCard, { backgroundColor: colors.icon+'15', borderLeftColor: getThemeAccentColor(colorTheme) }]}>
             <View style={styles.infoCardHeader}>
               <Ionicons name="color-palette" size={20} color={getThemeAccentColor(colorTheme)} />
-              <Text style={[styles.infoLabel, { color: colors.icon }]}>Thème sélectionné</Text>
+              <Text style={[styles.infoLabel, { color: colors.icon }]}>Selected Theme</Text>
             </View>
             <Text style={[styles.infoValue, { color: colors.text }]}>
-              {colorLabels[colorTheme]}
+              {colorTheme.charAt(0).toUpperCase() + colorTheme.slice(1)}
             </Text>
           </View>
 
@@ -131,7 +122,7 @@ export default function ParametersScreen() {
               <Text style={[styles.infoLabel, { color: colors.icon }]}>Mode</Text>
             </View>
             <Text style={[styles.infoValue, { color: colors.text }]}>
-              {isDark ? 'Sombre' : 'Clair'}
+              {isDark ? 'Dark' : 'Light'}
             </Text>
           </View>
         </View>
@@ -171,6 +162,7 @@ const styles = StyleSheet.create({
     marginLeft: 44,
   },
   section: {
+    paddingTop: 10,
     marginBottom: 32,
     paddingHorizontal: 16,
   },

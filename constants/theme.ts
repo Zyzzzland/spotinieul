@@ -19,6 +19,7 @@ export const ColorThemes: Record<ColorThemeType, string> = {
   orange: '#FF9800',
   cyan: '#00BCD4',
   yellow: '#FFC107',
+  default: '#353535'
 };
 
 // Color theme variants for light and dark mode
@@ -55,6 +56,10 @@ export const ColorThemeVariants: Record<ColorThemeType, { light: string; dark: s
     light: '#FFC107',
     dark: '#6B5A2A',
   },
+  default: {
+    light: '#353535',
+    dark: '#FFFFFF',
+  }
 };
 
 // Background colors for each theme (light and dark variants)
@@ -91,6 +96,10 @@ export const ThemeBackgrounds: Record<ColorThemeType, { light: string; dark: str
     light: '#FFFDE7', // Light yellow background
     dark: '#1A1A0A',  // Dark yellow background
   },
+  default: {
+    light: '#FFFFFF', // Light default background
+    dark: '#191919',  // Dark default background
+  }
 };
 
 // Text and icon colors that work with themed backgrounds
@@ -126,6 +135,10 @@ export const ThemeTextColors: Record<ColorThemeType, { light: { text: string; ic
   yellow: {
     light: { text: '#F57F17', icon: '#FBC02D' },
     dark: { text: '#FFFDE7', icon: '#FFD54F' },
+  },
+  default: {
+    light: { text: '#353535', icon: '#444444' },
+    dark: { text: '#ECEDEE', icon: '#9BA1A6' },
   },
 };
 
@@ -163,6 +176,10 @@ export const ThemePreviewColors: Record<ColorThemeType, { light: { primary: stri
     light: { primary: '#FFC107', secondary: '#FFFDE7', accent: '#FBC02D' },
     dark: { primary: '#6B5A2A', secondary: '#3D3D1F', accent: '#8B7A3A' },
   },
+  default: {
+    light: { primary: '#353535', secondary: '#FFFFFF', accent: '#444444' },
+    dark: { primary: '#fff', secondary: '#151718', accent: '#9BA1A6' },
+  }
 };
 
 export const Colors = {

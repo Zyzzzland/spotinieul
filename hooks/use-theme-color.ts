@@ -25,11 +25,12 @@ export function useThemeColors() {
   // Get themed background and text colors
   const themedBackground = ThemeBackgrounds[colorTheme][isDark ? 'dark' : 'light'];
   const themedTextColors = ThemeTextColors[colorTheme][isDark ? 'dark' : 'light'];
-  
+  const secondary = ThemeTextColors[colorTheme][isDark ? 'dark' : 'light'].icon+'15';
   return {
     primary: primaryColor,
     primaryLight: primaryColor + '30',
     primaryDark: primaryColor + '80',
+    backgroundCard: secondary,
     primaryRgba: (opacity: number) => hexToRgba(primaryColor, opacity),
     background: themedBackground,
     text: themedTextColors.text,
